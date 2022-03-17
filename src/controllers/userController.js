@@ -35,3 +35,36 @@ export async function getUser(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function getUserById(req, res) {
+  const { id } = req.params;
+
+  try {
+    const { rows: user } = await connection.query(`
+      SELECT 
+        users.id, 
+        users.name,
+        SUM(links."viewsCount") AS "visitCount"
+      FROM users
+        JOIN links ON links."userId"=users.id
+        WHERE users.id=$1
+      GROUP BY users.id;
+    `, [id]);
+  
+    if (user.length === 0) {
+      return res.sendStatus(404);
+    }
+
+    const { rows: shortenedUrls } = await connection.query(`
+      SELECT * FROM links WHERE "userId"=$1
+    `, [id]);
+
+    res.send({
+      ...user[0],
+      shortenedUrls
+    });
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}
