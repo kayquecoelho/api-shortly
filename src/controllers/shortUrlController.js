@@ -4,7 +4,7 @@ import { nanoid } from "nanoid";
 
 export async function generateShorten(req, res) {
   const urlSchema = joi.object({
-    url: joi.string().uri().required()
+    link: joi.string().uri().required()
   });
   const { user } = res.locals;
 
@@ -20,7 +20,7 @@ export async function generateShorten(req, res) {
     await connection.query(`
       INSERT INTO links ("shortUrl", url, "userId")
         VALUES ($1, $2, $3)
-    `, [shortUrl, req.body.url, user.id]);
+    `, [shortUrl, req.body.link, user.id]);
 
     return res.status(201).send({ shortUrl });
   } catch (error) {
@@ -47,6 +47,34 @@ export async function getShortUrl(req, res) {
     `, [viewsCount, result.rows[0].id]);
 
     return res.send(result.rows[0]);
+  } catch (error) {
+    console.log(error);
+    res.sendStatus(500);
+  }
+}
+
+export async function deleteShortUrl(req, res) {
+  const { id } = req.params;
+  const { user } = res.locals;
+
+  try {
+    const result = await connection.query(`
+      SELECT * FROM links WHERE id=$1
+    `, [id]);
+    
+    if (result.rowCount === 0) {
+      return res.sendStatus(404);
+    }
+
+    if (result.rows[0].userId !== user.id) {
+      return res.sendStatus(401);
+    }
+
+    await connection.query(`
+      DELETE FROM links WHERE id=$1
+    `, [id]);
+
+    return res.sendStatus(204);
   } catch (error) {
     console.log(error);
     res.sendStatus(500);

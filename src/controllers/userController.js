@@ -32,8 +32,7 @@ export async function createUser(req, res) {
 }
 
 export async function getUser(req, res) {
-  const { user } = res.locals;
-  const { id } = user;
+  const { id } = res.locals.user;
 
   try {
     const { rows: user } = await connection.query(
@@ -43,7 +42,7 @@ export async function getUser(req, res) {
         users.name,
         SUM(links."visitCount") AS "visitCount"
       FROM users
-        JOIN links ON links."userId"=users.id
+        LEFT JOIN links ON links."userId"=users.id
         WHERE users.id=$1
       GROUP BY users.id;
     `,
@@ -60,7 +59,7 @@ export async function getUser(req, res) {
     `,
       [id]
     );
-
+    
     res.send({
       ...user[0],
       shortenedUrls,
