@@ -13,8 +13,8 @@ CREATE TABLE sessions (
 
 CREATE TABLE links (
 	id SERIAL NOT NULL PRIMARY KEY,
-	"shortenUrl" TEXT NOT NULL,
+	"shortUrl" TEXT NOT NULL,
 	"url" TEXT NOT NULL,
 	"userId" INTEGER NOT NULL REFERENCES users(id),
-	"viewsCount" INTEGER NOT NULL DEFAULT 0
+	"visitCount" INTEGER NOT NULL DEFAULT 0
 );
