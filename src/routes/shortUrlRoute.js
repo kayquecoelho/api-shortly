@@ -1,8 +1,9 @@
-import { Route } from "express";
-import { generateShorten } from "../controllers/shortUrlController";
+import { Router } from "express";
+import { generateShorten } from "../controllers/shortUrlController.js";
+import { validateTokenMiddleware } from "../middlewares/validateTokenMiddleware.js";
 
-const shortUrlRoute = Route();
+const shortUrlRoute = Router();
 
-shortUrlRoute.post("/urls/shorten", generateShorten );
+shortUrlRoute.post("/urls/shorten", validateTokenMiddleware, generateShorten);
 
 export default shortUrlRoute;

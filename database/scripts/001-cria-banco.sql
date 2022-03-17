@@ -10,3 +10,11 @@ CREATE TABLE sessions (
    token TEXT NOT NULL UNIQUE,
    "userId" INTEGER NOT NULL REFERENCES users(id)
 );
+
+CREATE TABLE links (
+	id SERIAL NOT NULL PRIMARY KEY,
+	"shortenUrl" TEXT NOT NULL,
+	"url" TEXT NOT NULL,
+	"userId" INTEGER NOT NULL REFERENCES users(id),
+	"viewsCount" INTEGER NOT NULL DEFAULT 0
+);
