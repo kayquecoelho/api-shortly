@@ -69,3 +69,26 @@ export async function getUser(req, res) {
     return res.sendStatus(500);
   }
 }
+
+export async function getRankingOfUsers(req, res) {
+
+  try {
+    const ranking = await connection.query(`
+      SELECT 
+        u.id,
+        u.name,
+        COUNT (l.id) AS "linksCount",
+        SUM(l."visitCount") AS "visitCount"
+      FROM users u
+        LEFT JOIN links l on l."userId"=u.id
+      GROUP BY u.id
+      ORDER BY "visitCount"
+      LIMIT 10
+    `);
+    
+    res.send(ranking.rows)
+  } catch (error) {
+    console.log(error);
+    return res.sendStatus(500);
+  }
+}

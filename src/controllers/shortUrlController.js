@@ -34,14 +34,14 @@ export async function getShortUrl(req, res) {
 
   try {
     const result = await connection.query(`
-      SELECT * FROM links WHERE "shortenUrl"=$1
+      SELECT * FROM links WHERE "shortUrl"=$1
     `, [shortUrl]);
 
     if (result.rowCount === 0) {
       return res.sendStatus(404);
     }
 
-    const viewsCount = result.rows[0].viewsCount + 1;
+    const viewsCount = result.rows[0].visitCount + 1;
     await connection.query(`
       UPDATE links SET "visitCount"=$1 WHERE id=$2
     `, [viewsCount, result.rows[0].id]);
